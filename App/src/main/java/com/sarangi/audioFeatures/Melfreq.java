@@ -75,24 +75,27 @@ public class Melfreq{
 
                         try{
                                 AudioDispatcher audioDispatcher = AudioDispatcherFactory.fromFloatArray(singleFrame,samplingFrequency,length,0);
-                                MFCC mfcc = new MFCC(length,samplingFrequency);
+                                //MFCC mfcc = new MFCC(length,samplingFrequency);
+                                MFCC mfcc = new MFCC(length,samplingFrequency,13,30,133.3334f,((float)samplingFrequency)/2f);
                                 audioDispatcher.addAudioProcessor(mfcc);
                                 audioDispatcher.run();
+                                float[] numbersReceived = mfcc.getMFCC();
                                 mfccFeatures.add(mfcc.getMFCC());
                         }catch(Exception ex){
                                 logger.log(Level.SEVERE,ex.toString(),ex);
                         }
                 }
 
-                /**
-                 * Returns the MFCC features of the song.
-                 *
-                 * @return      Mfcc features of the song.
-                 *
-                 */
-
                 
         }
+
+        /**
+         * Returns the MFCC features of the song.
+         *
+         * @return      Mfcc features of the song.
+         *
+         */
+
         
         public List<float[]> getMfccFeatures(){
                 return mfccFeatures;

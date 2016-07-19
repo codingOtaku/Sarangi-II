@@ -32,7 +32,7 @@ import javax.sound.sampled.*;
 
 public class FeatureExtractor{
 
-        /* FILEDS **************************************************/
+        /* FIELDS **************************************************/
 
         /**
          * Logger is used to maintain the log of the program. The log contain the error message generated during the

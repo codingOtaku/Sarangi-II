@@ -95,6 +95,19 @@
                         <version>1.0.3-1</version>
                 </dependency>
 
+                <dependency>
+                            <groupId>com.mkobos</groupId>
+                            <artifactId>pca_transform</artifactId>
+                            <version>1.0.2</version>
+                </dependency>
+
+                <!-- https://mvnrepository.com/artifact/gov.nist.math/jama -->
+                <dependency>
+                            <groupId>gov.nist.math</groupId>
+                            <artifactId>jama</artifactId>
+                            <version>1.0.3</version>
+                </dependency>
+
         </dependencies>
 
         <reporting>

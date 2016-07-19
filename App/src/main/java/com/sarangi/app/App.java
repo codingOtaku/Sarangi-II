@@ -8,6 +8,9 @@
 
 package com.sarangi.app;
 
+import com.sarangi.json.SongLoader;
+import com.sarangi.learningTools.SongPCA;
+
 /**
  * A main class for interfacing all the other sub-classes.
  *
@@ -39,10 +42,17 @@ public class App
         public static void main( String[] args )
         {
 
-                FeatureExtractor featureExtractor = new FeatureExtractor();
+                //FeatureExtractor featureExtractor = new FeatureExtractor();
 
-                featureExtractor.extractFeature(new String("src/resources/song/songFeatures/features.txt"),new String("src/resources/song/training"));
-                featureExtractor.extractFeature(new String("src/resources/song/songFeatures/test.txt"),new String("src/resources/song/testing"));
+                //featureExtractor.extractFeature(new String("src/resources/song/songFeatures/features.txt"),new String("src/resources/song/training"));
+                //featureExtractor.extractFeature(new String("src/resources/song/songFeatures/test.txt"),new String("src/resources/song/testing"));
 
+                SongLoader songLoader = new SongLoader(new String("src/resources/song/songFeatures/test.txt"));
+                songLoader.loadSongs();
+
+                SongPCA songPCA = new SongPCA(songLoader.getSongs());
+                songPCA.runPCA();
+
+                songPCA.storeSongs(new String( "src/resources/song/songFeatures/test_PCA.txt" ));
         }
 }

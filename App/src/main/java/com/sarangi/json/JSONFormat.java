@@ -55,6 +55,7 @@ public class JSONFormat{
         public JSONFormat(){
 
                 logger.setLevel(Level.SEVERE);
+
         }
 
         /** First the given arraylist is converted into json format and then stored
