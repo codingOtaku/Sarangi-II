@@ -9,8 +9,7 @@
 
 package com.sarangi.learningTools;
 
-import com.mkobos.pca_transform.*;
-import Jama.Matrix;
+import smile.projection.PCA;
 import com.sarangi.json.*;
 import com.sarangi.structures.*;
 import java.util.logging.*;
@@ -71,19 +70,23 @@ public class SongPCA {
                 // For each Song
                 for (Song song: allSongs) { 
 
-                // Get Jama Matrix for given Song
-                
-                        Matrix mfccMatrix = getMfccMatrix(song);
                 // Apply PCA to Matrix
-                        PCA pca = new PCA(mfccMatrix);
+                        double[][] mfccData = getMfccData(song);
+                        PCA pca = new PCA(mfccData);
 
-                        Matrix transformedMatrix =
-                               pca.transform(mfccMatrix, PCA.TransformationType.ROTATION);
-                // Convert Jama Matrix back to Song
+                        pca.setProjection(0.85);
+
+                        double[] varianceData = pca.getCumulativeVarianceProportion();
+
+                        for (int i=0; i<varianceData.length; i++) {
+                                System.out.println(varianceData[i]);
+                        }
+
+                        List<float[]> mfccListData = convertMfccToList(pca.project(mfccData));
 
                         Song transformedSong = new Song(song.getSongName(),
                                                         song.getIntensity(),
-                                                        getMfccDataFromMfccMatrix(transformedMatrix),
+                                                        mfccListData,
                                                         song.getPitch());
 
                 // Add song to tempSongs
@@ -97,14 +100,14 @@ public class SongPCA {
         }
 
         /**
-         * Returns the corresponding Jama Matrix of the given Song
+         * Returns the corresponding 2D double of the given Song
          * 
          * @param song Song object to be converted
          *
-         * @return The corresponding Jama Matrix
+         * @return The corresponding 2D doubles array
          *
          */
-        private static Matrix getMfccMatrix(Song song) {
+        private static double[][] getMfccData(Song song) {
 
                 List<float[]> mfccData = song.getMelcoeff();
 
@@ -116,31 +119,30 @@ public class SongPCA {
 
                 }
 
-                return new Matrix(mfccArray);
+                return mfccArray;
         }
 
         /**
          * Returns the corresponding MFCC array of the given MFCC Jama Matrix
          * 
-         * @param mfccMatrix Jama Matrix for MFCC data
+         * @param mfccData 2D array of doubles
          *
          * @return Corresponding MFCC data array
          *
          */
-        private static List<float[]> getMfccDataFromMfccMatrix(Matrix mfccMatrix) {
+        private static List<float[]> convertMfccToList(double[][] mfccData) {
 
-                List<float[]> mfccData = new ArrayList<float[]>();
+                List<float[]> mfccListData = new ArrayList<float[]>();
 
-
-                for(int r = 0; r < mfccMatrix.getRowDimension(); r++){
-                        float[] tempArray = new float[mfccMatrix.getColumnDimension()];
-                    for(int c = 0; c < mfccMatrix.getColumnDimension(); c++){
-                            tempArray[c] = ((float)mfccMatrix.get(r, c));
+                for(int r = 0; r < mfccData.length; r++){
+                        float[] tempArray = new float[mfccData[r].length];
+                    for(int c = 0; c < mfccData[r].length; c++){
+                            tempArray[c] = ((float)mfccData[r][c]);
                     }
-                    mfccData.add(tempArray);
+                    mfccListData.add(tempArray);
                 }
 
-                return mfccData;
+                return mfccListData;
         }
 
         /**

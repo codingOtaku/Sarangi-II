@@ -76,11 +76,13 @@ public class Melfreq{
                         try{
                                 AudioDispatcher audioDispatcher = AudioDispatcherFactory.fromFloatArray(singleFrame,samplingFrequency,length,0);
                                 //MFCC mfcc = new MFCC(length,samplingFrequency);
-                                MFCC mfcc = new MFCC(length,samplingFrequency,13,30,133.3334f,((float)samplingFrequency)/2f);
+                                MFCC mfcc = new MFCC(length,samplingFrequency,15,30,133.3334f,((float)samplingFrequency)/2f);
                                 audioDispatcher.addAudioProcessor(mfcc);
                                 audioDispatcher.run();
                                 float[] numbersReceived = mfcc.getMFCC();
-                                mfccFeatures.add(mfcc.getMFCC());
+
+                                // Exclude first coefficient
+                                mfccFeatures.add(Arrays.copyOfRange(numbersReceived,1,numbersReceived.length));
                         }catch(Exception ex){
                                 logger.log(Level.SEVERE,ex.toString(),ex);
                         }
