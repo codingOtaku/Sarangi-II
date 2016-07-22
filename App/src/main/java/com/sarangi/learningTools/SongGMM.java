@@ -1,5 +1,5 @@
 /*
- * (@)# SongPCA.java  2.0     July 19,2016.
+ * (@)# SongGMM.java  2.0     July 20,2016.
  *
  * Bijay Gurung
  *
@@ -9,22 +9,34 @@
 
 package com.sarangi.learningTools;
 
-import smile.projection.PCA;
+import org.apache.commons.math3.distribution.*;
+import org.apache.commons.math3.distribution.*;
+import org.apache.commons.math3.distribution.fitting.*;
+import org.apache.commons.math3.util.Pair;
+
+import smile.clustering.GMeans;
 import com.sarangi.json.*;
 import com.sarangi.structures.*;
 import java.util.logging.*;
 import java.io.*;
 import java.util.*;
+import java.lang.Object.*;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.reflect.*;
+import java.lang.reflect.Type;
 
 /**
- * A class for performing PCA on the Song Features.
+ * A class to determine GMM parameters for the songs.
  *
  * @author Bijay Gurung
  * @version 2.0
  *
  */
 
-public class SongPCA {
+public class SongGMM {
 
         /*FIELDS**********************************************************/
 
@@ -33,10 +45,10 @@ public class SongPCA {
          * execution of the program, warning messages to the user and information about the status of the program
          * to the user. The log is also beneficial during program debugging.
          */
-        private Logger logger = Logger.getLogger("SongPCA");
+        private Logger logger = Logger.getLogger("SongGMM");
 
         /**
-         * The Songs whose features are to be processed using PCA.
+         * The Songs whose to be processed
          *
          */
         private List<Song> allSongs;
@@ -52,7 +64,7 @@ public class SongPCA {
          * @param allSongs All the songs
          */
 
-        public SongPCA(List<Song> allSongs){
+        public SongGMM(List<Song> allSongs){
 
                 this.allSongs = allSongs;
                 logger.setLevel(Level.SEVERE);
@@ -60,42 +72,39 @@ public class SongPCA {
         }
 
         /**
-         * Run PCA on the songs in allSongs.
+         * Calculate GMM values
          *
          */
-        public void runPCA() {
-
-                List<Song> tempSongs = new ArrayList<Song>();
+        public void calculateGMM() {
 
                 // For each Song
                 for (Song song: allSongs) { 
 
-                // Apply PCA to Matrix
                         double[][] mfccData = getMfccData(song);
-                        PCA pca = new PCA(mfccData);
 
-                        pca.setProjection(6);
+                        /*
+                        GMeans gmeans = new GMeans(mfccData,10);
+                        System.out.println(gmeans.toString());
+                        */
 
-                        double[] varianceData = pca.getCumulativeVarianceProportion();
+                        MultivariateNormalMixtureExpectationMaximization mmm = new MultivariateNormalMixtureExpectationMaximization(mfccData);
+                        // Make 6 components
+                        mmm.fit(MultivariateNormalMixtureExpectationMaximization.estimate(mfccData,6));
 
-                        for (int i=0; i<varianceData.length; i++) {
-                                System.out.println(varianceData[i]);
-                        }
+                        //System.out.println("Log Likelihood:"+mmm.getLogLikelihood());
+                        //List<Pair<Double,double>> results = mmm.getComponents();
+                        //MultivariateNormalMixtureExpectationMaximization fittedModel = mmm.getFittedModel();
+                        MixtureMultivariateNormalDistribution fittedModel = mmm.getFittedModel();
 
-                        List<float[]> mfccListData = convertMfccToList(pca.project(mfccData));
+                        final List<Pair<Double, MultivariateNormalDistribution>> components = fittedModel.getComponents();
 
-                        Song transformedSong = new Song(song.getSongName(),
-                                                        song.getIntensity(),
-                                                        mfccListData,
-                                                        song.getPitch());
+                        GsonBuilder gsonBuilder = new GsonBuilder();  
+                        gsonBuilder.serializeSpecialFloatingPointValues();  
+                        Gson gson = gsonBuilder.setPrettyPrinting().create();
+                        System.out.println(gson.toJson(fittedModel.getComponents()));
 
-                // Add song to tempSongs
-                        tempSongs.add(transformedSong);
                 }
 
-                // Assign tempSongs to allSongs
-
-                allSongs = tempSongs;
                 
         }
 
