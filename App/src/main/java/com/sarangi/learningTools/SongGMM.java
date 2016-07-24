@@ -98,13 +98,18 @@ public class SongGMM {
 
                         final List<Pair<Double, MultivariateNormalDistribution>> components = fittedModel.getComponents();
 
+                        ClusterGMM gm1 = new ClusterGMM(components.get(0).getSecond());
+                        ClusterGMM gm2 = new ClusterGMM(components.get(1).getSecond());
+
+                        System.out.println(gm1.groundDist(gm2));
+
+                        /*
                         GsonBuilder gsonBuilder = new GsonBuilder();  
                         gsonBuilder.serializeSpecialFloatingPointValues();  
                         Gson gson = gsonBuilder.setPrettyPrinting().create();
-                        System.out.println(gson.toJson(fittedModel.getComponents()));
-
+                        System.out.println(gson.toJson(fittedModel.getComponents().get(0).getSecond().getCovariances()));
+                        */
                 }
-
                 
         }
 
