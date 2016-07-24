@@ -10,6 +10,11 @@ package com.sarangi.app;
 
 import com.sarangi.json.SongLoader;
 import com.sarangi.learningTools.*;
+import com.sarangi.structures.Song;
+
+import com.telmomenezes.jfastemd.*;
+
+import java.util.*;
 
 /**
  * A main class for interfacing all the other sub-classes.
@@ -56,8 +61,17 @@ public class App
                 songPCA.storeSongs(new String( "src/resources/song/songFeatures/hiphop2PCA.txt" ));
                 */
 
-                SongGMM songGMM = new SongGMM(songLoader.getSongs());
-                songGMM.calculateGMM();
+                List<Song> allSongs = songLoader.getSongs();
+                
+                SongGMM songGMM1 = new SongGMM(allSongs.get(0));
+                songGMM1.calculateGMM();
+                SongGMM songGMM2 = new SongGMM(allSongs.get(0));
+                songGMM2.calculateGMM();
+
+                Signature sig1 = songGMM1.getSignature();
+                Signature sig2 = songGMM1.getSignature();
+
+                System.out.println(JFastEMD.distance(sig1,sig2,-1));
 
         }
 }

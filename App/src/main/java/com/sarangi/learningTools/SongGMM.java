@@ -14,6 +14,8 @@ import org.apache.commons.math3.distribution.*;
 import org.apache.commons.math3.distribution.fitting.*;
 import org.apache.commons.math3.util.Pair;
 
+import com.telmomenezes.jfastemd.*;
+
 import smile.clustering.GMeans;
 import com.sarangi.json.*;
 import com.sarangi.structures.*;
@@ -29,7 +31,7 @@ import com.google.gson.reflect.*;
 import java.lang.reflect.Type;
 
 /**
- * A class to determine GMM parameters for the songs.
+ * Represents the GMM for a particular song.
  *
  * @author Bijay Gurung
  * @version 2.0
@@ -48,25 +50,32 @@ public class SongGMM {
         private Logger logger = Logger.getLogger("SongGMM");
 
         /**
-         * The Songs whose to be processed
+         * The Song to be processed
          *
          */
-        private List<Song> allSongs;
+        private Song song;
 
+        /**
+         * The components representing the multivariate normal distribution of the song.
+         *
+         */
+        private List<Pair<Double, MultivariateNormalDistribution>> components;
+
+        public static int numOfClusters = 6;
 
         /*CONSTRUCTORS****************************************************/
 
         /**
-         * Inject the songs as dependency into the constructor. 
+         * Inject the song as dependency into the constructor. 
          * Also, set the log level.
          * The log levels are SEVERE, WARNING and INFO mainly.
          *
-         * @param allSongs All the songs
+         * @param song The Song Object
          */
 
-        public SongGMM(List<Song> allSongs){
+        public SongGMM(Song song){
 
-                this.allSongs = allSongs;
+                this.song = song;
                 logger.setLevel(Level.SEVERE);
 
         }
@@ -77,40 +86,43 @@ public class SongGMM {
          */
         public void calculateGMM() {
 
-                // For each Song
-                for (Song song: allSongs) { 
 
-                        double[][] mfccData = getMfccData(song);
+                double[][] mfccData = getMfccData(this.song);
 
-                        /*
-                        GMeans gmeans = new GMeans(mfccData,10);
-                        System.out.println(gmeans.toString());
-                        */
 
-                        MultivariateNormalMixtureExpectationMaximization mmm = new MultivariateNormalMixtureExpectationMaximization(mfccData);
-                        // Make 6 components
-                        mmm.fit(MultivariateNormalMixtureExpectationMaximization.estimate(mfccData,6));
-
-                        //System.out.println("Log Likelihood:"+mmm.getLogLikelihood());
-                        //List<Pair<Double,double>> results = mmm.getComponents();
-                        //MultivariateNormalMixtureExpectationMaximization fittedModel = mmm.getFittedModel();
-                        MixtureMultivariateNormalDistribution fittedModel = mmm.getFittedModel();
-
-                        final List<Pair<Double, MultivariateNormalDistribution>> components = fittedModel.getComponents();
-
-                        ClusterGMM gm1 = new ClusterGMM(components.get(0).getSecond());
-                        ClusterGMM gm2 = new ClusterGMM(components.get(1).getSecond());
-
-                        System.out.println(gm1.groundDist(gm2));
-
-                        /*
-                        GsonBuilder gsonBuilder = new GsonBuilder();  
-                        gsonBuilder.serializeSpecialFloatingPointValues();  
-                        Gson gson = gsonBuilder.setPrettyPrinting().create();
-                        System.out.println(gson.toJson(fittedModel.getComponents().get(0).getSecond().getCovariances()));
-                        */
-                }
+                MultivariateNormalMixtureExpectationMaximization mmm = new MultivariateNormalMixtureExpectationMaximization(mfccData);
                 
+                // Make 6 components
+                mmm.fit(MultivariateNormalMixtureExpectationMaximization.estimate(mfccData,numOfClusters));
+
+                MixtureMultivariateNormalDistribution fittedModel = mmm.getFittedModel();
+
+                this.components = fittedModel.getComponents();
+
+                
+        }
+
+        /**
+         * Get the jFastEMD Signature for the song.
+         *
+         */
+        public Signature getSignature() {
+
+            ClusterGMM[] clusters= new ClusterGMM[numOfClusters];
+            double[] weights = new double[numOfClusters];
+
+            for (int i=0; i<numOfClusters; i++) {
+                    clusters[i] = new ClusterGMM(components.get(i).getSecond());
+                    weights[i] = components.get(i).getFirst();
+            }
+
+            Signature signature = new Signature();
+            signature.setNumberOfFeatures(numOfClusters);
+            signature.setFeatures(clusters);
+            signature.setWeights(weights);
+
+            return signature;
+
         }
 
         /**
@@ -186,7 +198,7 @@ public class SongGMM {
 
                 JSONFormat jsonFormat = new JSONFormat();
 
-                jsonFormat.convertArrayToJSON(this.allSongs,filename);
+                //jsonFormat.convertArrayToJSON(this.allSongs,filename);
         }
 
 }
