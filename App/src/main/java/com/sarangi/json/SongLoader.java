@@ -69,6 +69,15 @@ public class SongLoader {
         }
 
         /**
+         * Set the filename.
+         *
+         * @param filename The file from which to load the songs
+         */
+        public void setFilename(String filename) {
+                this.filename = filename;
+        }
+
+        /**
          * Load the Songs.
          *
          * <p>
@@ -80,6 +89,10 @@ public class SongLoader {
                 //TODO JSONFormat is being instantiated unnecessarily.
                 
                 JSONFormat jsonFormat = new JSONFormat();
+
+                if (loadedSongs!=null) {
+                    loadedSongs.clear();
+                }
 
                 loadedSongs = jsonFormat.convertJSONtoArray(filename);
 

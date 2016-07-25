@@ -41,6 +41,12 @@ public class SongPCA {
          */
         private List<Song> allSongs;
 
+        /**
+         * The number of dimensions
+         *
+         */
+        public static final int DIMENSIONS = 12;
+
 
         /*CONSTRUCTORS****************************************************/
 
@@ -74,13 +80,9 @@ public class SongPCA {
                         double[][] mfccData = getMfccData(song);
                         PCA pca = new PCA(mfccData);
 
-                        pca.setProjection(6);
+                        pca.setProjection(DIMENSIONS);
 
                         double[] varianceData = pca.getCumulativeVarianceProportion();
-
-                        for (int i=0; i<varianceData.length; i++) {
-                                System.out.println(varianceData[i]);
-                        }
 
                         List<float[]> mfccListData = convertMfccToList(pca.project(mfccData));
 

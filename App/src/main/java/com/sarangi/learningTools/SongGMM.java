@@ -61,6 +61,10 @@ public class SongGMM {
          */
         private List<Pair<Double, MultivariateNormalDistribution>> components;
 
+        /**
+         * The Number of Clusters to Form
+         *
+         */
         public static int numOfClusters = 6;
 
         /*CONSTRUCTORS****************************************************/
@@ -92,7 +96,6 @@ public class SongGMM {
 
                 MultivariateNormalMixtureExpectationMaximization mmm = new MultivariateNormalMixtureExpectationMaximization(mfccData);
                 
-                // Make 6 components
                 mmm.fit(MultivariateNormalMixtureExpectationMaximization.estimate(mfccData,numOfClusters));
 
                 MixtureMultivariateNormalDistribution fittedModel = mmm.getFittedModel();

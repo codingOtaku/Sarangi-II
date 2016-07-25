@@ -55,11 +55,6 @@ public class ClusterGMM implements Feature {
          */
         public MultivariateNormalDistribution distribution;
 
-        /**
-         * The number of dimensions
-         *
-         */
-        public static int dimensions = 6;
 
 
         /*CONSTRUCTORS****************************************************/
@@ -103,8 +98,8 @@ public class ClusterGMM implements Feature {
                 RealMatrix cov1 = cg1.distribution.getCovariances();
                 RealMatrix cov2 = cg2.distribution.getCovariances();
 
-                RealMatrix mu1Mat = MatrixUtils.createRealMatrix(dimensions,1);
-                RealMatrix mu2Mat = MatrixUtils.createRealMatrix(dimensions,1);
+                RealMatrix mu1Mat = MatrixUtils.createRealMatrix(SongPCA.DIMENSIONS,1);
+                RealMatrix mu2Mat = MatrixUtils.createRealMatrix(SongPCA.DIMENSIONS,1);
 
                 mu1Mat.setColumn(0,mu1);
                 mu2Mat.setColumn(0,mu2);
@@ -119,7 +114,7 @@ public class ClusterGMM implements Feature {
                 RealMatrix inversetM2 = decM2.getSolver().getInverse();
 
                 return (0.5*Math.log(detCov2/detCov1) + inversetM2.multiply(cov1).getTrace() + 
-                                (muDifTranspose.multiply(inversetM2.multiply(muDif))).getEntry(0,0) - dimensions);
+                                (muDifTranspose.multiply(inversetM2.multiply(muDif))).getEntry(0,0) - SongPCA.DIMENSIONS);
 
         }
 }

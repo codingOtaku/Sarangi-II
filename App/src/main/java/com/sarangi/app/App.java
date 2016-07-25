@@ -49,27 +49,30 @@ public class App
 
                 FeatureExtractor featureExtractor = new FeatureExtractor();
 
+                String fileWithoutPCA = new String("src/resources/song/songFeatures/sampleSongs.txt");
+                String fileWithPCA = new String("src/resources/song/songFeatures/sampleSongsPCA.txt");
                 //featureExtractor.extractFeature(new String("src/resources/song/songFeatures/features.txt"),new String("src/resources/song/training"));
-                //featureExtractor.extractFeature(new String("src/resources/song/songFeatures/hiphop2.txt"),new String("src/resources/song/testing"));
+                featureExtractor.extractFeature(fileWithoutPCA,new String("src/resources/song/testing"));
 
-                SongLoader songLoader = new SongLoader(new String("src/resources/song/songFeatures/hiphop2PCA.txt"));
+                SongLoader songLoader = new SongLoader(fileWithoutPCA);
                 songLoader.loadSongs();
 
-                /*
                 SongPCA songPCA = new SongPCA(songLoader.getSongs());
                 songPCA.runPCA();
-                songPCA.storeSongs(new String( "src/resources/song/songFeatures/hiphop2PCA.txt" ));
-                */
+                songPCA.storeSongs(fileWithPCA);
+
+                songLoader.setFilename(fileWithPCA);
+                songLoader.loadSongs();
 
                 List<Song> allSongs = songLoader.getSongs();
                 
                 SongGMM songGMM1 = new SongGMM(allSongs.get(0));
                 songGMM1.calculateGMM();
-                SongGMM songGMM2 = new SongGMM(allSongs.get(0));
+                SongGMM songGMM2 = new SongGMM(allSongs.get(1));
                 songGMM2.calculateGMM();
 
                 Signature sig1 = songGMM1.getSignature();
-                Signature sig2 = songGMM1.getSignature();
+                Signature sig2 = songGMM2.getSignature();
 
                 System.out.println(JFastEMD.distance(sig1,sig2,-1));
 
