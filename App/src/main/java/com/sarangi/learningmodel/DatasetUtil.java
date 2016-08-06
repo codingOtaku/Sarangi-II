@@ -221,5 +221,21 @@ public class DatasetUtil {
             return output;
         }
 
+        public static List<List<Song>> getLabelWiseDataset(List<Song> songs, String[] labelArray) {
+
+                List<List<Song>> labelSongs = new ArrayList<List<Song>>();
+
+                for (int i=0; i < labelArray.length; i++ ) {
+                        labelSongs.add(new ArrayList<Song>());
+                }
+
+                for (Song song: songs) {
+                        int index = getIndexOfLabel(song.getSongName(),labelArray) - 1;
+                        labelSongs.get(index).add(song);
+                }
+
+                return labelSongs;
+
+        }
 
 }
